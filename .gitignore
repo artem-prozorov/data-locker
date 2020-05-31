@@ -1,0 +1,3 @@
+docker-compose.yml
+vendor
+.phpunit.result.cache
