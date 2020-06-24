@@ -12,6 +12,7 @@ interface TransportInterface
      * @access	public
      * @param	Address	$address
      * @param	string 	$text
+     * @throws  \Prozorov\DataVerification\Exceptions\TransportException
      * @return	void
      */
     public function send(AbstractMessage $mesage): void;

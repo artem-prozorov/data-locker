@@ -33,12 +33,42 @@ class DebugTransport implements TransportInterface
             $text = $message->render();
             $address = $message->getAddress();
 
-            $filename = $this->getPath() . '/' . $address->__toString() . '_' . strtotime('now') . '.txt';
+            $filename = $this->getPath() . '/' . $address->__toString() . '_' . $this->getTimestamp() . '.txt';
 
-            file_put_contents($filename, $text);
+            $test = $this->putContents($filename, $text);
+
+            var_dump($test);
+
+            if (! $test) {
+                throw new \RuntimeException('Unable to write data');
+            }
         } catch (\Exception $exception) {
             throw new TransportException('Unable to send message', 1, $exception);
         }
+    }
+
+    /**
+     * putContents wrapper
+     *
+     * @access	protected
+     * @param	string	$filename	
+     * @param	mixed 	$content 	
+     * @return	int|bool
+     */
+    protected function putContents(string $filename, $content)
+    {
+        return file_put_contents($filename, $content);
+    }
+
+    /**
+     * getTimestamp.
+     *
+     * @access	protected
+     * @return	string
+     */
+    protected function getTimestamp(): string
+    {
+        return (string) strtotime('now');
     }
 
     /**
