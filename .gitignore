@@ -1,3 +1,4 @@
 docker-compose.yml
 vendor
 .phpunit.result.cache
+tests/data/*.txt
