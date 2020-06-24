@@ -1,5 +1,7 @@
 <?php
 
+namespace Prozorov\DataVerification\Tests;
+
 use PHPUnit\Framework\TestCase;
 use Prozorov\DataVerification\Models\{Code, VerificationData};
 

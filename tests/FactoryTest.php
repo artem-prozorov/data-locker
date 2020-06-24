@@ -1,5 +1,7 @@
 <?php
 
+namespace Prozorov\DataVerification\Tests;
+
 use PHPUnit\Framework\TestCase;
 use Prozorov\DataVerification\Factories\{MessageFactory, TransportFactory};
 use Prozorov\DataVerification\Messages\SmsMessage;

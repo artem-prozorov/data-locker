@@ -1,5 +1,7 @@
 <?php
 
+namespace Prozorov\DataVerification\Tests;
+
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Prozorov\DataVerification\CodeManager;
 use Prozorov\DataVerification\Configuration;
@@ -7,10 +9,12 @@ use Prozorov\DataVerification\Models\Code;
 use Prozorov\DataVerification\Types\Phone;
 use Prozorov\DataVerification\Exceptions\{LimitException, VerificationException};
 use Prozorov\DataVerification\Repositories\FakeCodeRepo;
-use Psr\Container\ContainerInterface;
+use Mockery;
 
 class CodeManagerTest extends MockeryTestCase
 {
+    use HasContainer;
+
     public function testCodeLength()
     {
         $phone = new Phone('89181234567');
@@ -156,33 +160,5 @@ class CodeManagerTest extends MockeryTestCase
         $configuration = new Configuration($this->getContainer(), $config);
 
         return new CodeManager($configuration);
-    }
-
-    /**
-     * getContainer.
-     *
-     * @access	protected
-     * @return	ContainerInterface
-     */
-    protected function getContainer(): ContainerInterface
-    {
-        return new class implements ContainerInterface {
-            protected $bindings;
-
-            public function get($id)
-            {
-                return $this->bindings[$id];
-            }
-
-            public function has($id)
-            {
-                return empty($this->bindings[$id]);
-            }
-
-            public function setBindings(array $bindings)
-            {
-                $this->bindings = $bindings;
-            }
-        };
     }
 }

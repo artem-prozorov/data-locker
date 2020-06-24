@@ -13,6 +13,11 @@
             "Prozorov\\DataVerification\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Prozorov\\DataVerification\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "psr/container": "^1.0"
     },

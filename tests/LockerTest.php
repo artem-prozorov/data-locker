@@ -1,15 +1,19 @@
 <?php
 
+namespace Prozorov\DataVerification\Tests;
+
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Prozorov\DataVerification\Configuration;
 use Prozorov\DataVerification\Locker;
-use Psr\Container\ContainerInterface;
 use Prozorov\DataVerification\Types\Phone;
 use Prozorov\DataVerification\Messages\SmsMessage;
 use Prozorov\DataVerification\Repositories\FakeCodeRepo;
+use Mockery;
 
 class LockerTest extends MockeryTestCase
 {
+    use HasContainer;
+
     public function testLockingData()
     {
         $config = new Configuration(
@@ -44,33 +48,5 @@ class LockerTest extends MockeryTestCase
         $unlocked = $locker->getUnlockedData($verification, $pass);
 
         $this->assertEquals($data, $unlocked);
-    }
-
-    /**
-     * getContainer.
-     *
-     * @access	protected
-     * @return	ContainerInterface
-     */
-    protected function getContainer(): ContainerInterface
-    {
-        return new class implements ContainerInterface {
-            protected $bindings;
-
-            public function get($id)
-            {
-                return $this->bindings[$id];
-            }
-
-            public function has($id)
-            {
-                return empty($this->bindings[$id]);
-            }
-
-            public function setBindings(array $bindings)
-            {
-                $this->bindings = $bindings;
-            }
-        };
     }
 }
