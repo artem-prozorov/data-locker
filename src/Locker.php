@@ -70,22 +70,4 @@ class Locker
 
         return $code->getVerificationData();
     }
-
-    /**
-     * Returns validated data
-     *
-     * @access	public
-     * @param	string	$verificationCode	
-     * @return	array
-     */
-    public function getVerifiedData(string $verificationCode): array
-    {
-        $code = $this->config->getCodeRepo()->getValidatedCode($verificationCode);
-
-        if (empty($code)) {
-            throw new \OutOfBoundsException('Данные не найдены');
-        }
-
-        return $code->getVerificationData();
-    }
 }
