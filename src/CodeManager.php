@@ -10,6 +10,11 @@ use Prozorov\DataVerification\Types\Address;
 
 class CodeManager
 {
+    /**
+     * @var Configuration $config
+     */
+    protected $config;
+
     public function __construct(Configuration $config)
     {
         $this->config = $config;
@@ -89,6 +94,7 @@ class CodeManager
         $symbols = $this->config->getAllowedSymbols();
         $length = $this->config->getPassLength();
         $otp = '';
+
         for ($i = 1; $i <= $length; $i++) {
             $otp .= $symbols[rand(0, (count($symbols) - 1))];
         }
@@ -114,6 +120,7 @@ class CodeManager
         }
 
         $createdAfter = (new \Datetime())->sub(new \DateInterval('PT3600S'));
+
         if ($attempts = $this->config->getCodeRepo()->getCodesCountForAddress($address, $createdAfter)) {
             $limitPerHour = $this->config->getLimitPerHour();
             if ($limitPerHour < $attempts) {

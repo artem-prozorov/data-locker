@@ -61,7 +61,7 @@ class Configuration
     /**
      * @var array $resolve
      */
-    protected $resolved= [];
+    protected $resolved = [];
 
     /**
      * loadConfig.
