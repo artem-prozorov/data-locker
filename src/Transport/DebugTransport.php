@@ -25,18 +25,6 @@ class DebugTransport implements TransportInterface
     }
 
     /**
-     * setDebugPath.
-     *
-     * @access	public static
-     * @param	string	$path
-     * @return	void
-     */
-    public static function setDebugPath(string $path): void
-    {
-        static::$path = $path;
-    }
-
-    /**
      * @inheritDoc
      */
     public function send(AbstractMessage $message): void
@@ -45,11 +33,11 @@ class DebugTransport implements TransportInterface
             $text = $message->render();
             $address = $message->getAddress();
 
-            $filename = $this->getPath() . '/' . $address->toString() . '_' . strtotime('now') . '.txt';
+            $filename = $this->getPath() . '/' . $address->__toString() . '_' . strtotime('now') . '.txt';
 
             file_put_contents($filename, $text);
         } catch (\Exception $exception) {
-            throw new TransportException('Unable to send message', '', $exception);
+            throw new TransportException('Unable to send message', 1, $exception);
         }
     }
 
@@ -61,6 +49,6 @@ class DebugTransport implements TransportInterface
      */
     protected function getPath(): string
     {
-        return $this->$path;
+        return (string) $this->path;
     }
 }

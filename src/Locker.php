@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Prozorov\DataVerification;
 
-use Prozorov\DataVerification\Contracts\MessageInterface;
 use Prozorov\DataVerification\Models\Code;
 use Prozorov\DataVerification\Types\Address;
+use Prozorov\DataVerification\Messages\AbstractMessage;
 use Webmozart\Assert\Assert;
 
 class Locker
@@ -33,7 +33,7 @@ class Locker
      * @access	public
      * @param	array $data - the data that must be locked and verified
      * @param	Address	$address - address where we will send one-time password to
-     * @param	MessageInterface|string $message - message object or string code for the message factory
+     * @param	AbstractMessage|string $message - message object or string code for the message factory
      * @return	Code
      */
     public function lockData(array $data, Address $address, $message): Code
@@ -44,7 +44,7 @@ class Locker
             $message = $this->config->getMessageFactory()->make($message);
         }
 
-        Assert::isInstanceOf($message, MessageInterface::class);
+        Assert::isInstanceOf($message, AbstractMessage::class);
 
         $message->setCode($code)->setAddress($address);
 
