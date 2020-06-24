@@ -2,10 +2,12 @@
 
 namespace Prozorov\DataVerification\Factories;
 
-use Prozorov\DataVerification\Base\AbstractFactory;
-use Prozorov\DataVerification\Traits\Singleton;
+use Prozorov\DataVerification\Contracts\TransportInterface;
 
 class TransportFactory extends AbstractFactory
 {
-    use Singleton;
+    /**
+     * @var string $allowedType
+     */
+    protected $allowedType = TransportInterface::class;
 }

@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Prozorov\DataVerification\App;
+namespace Prozorov\DataVerification;
 
-use Prozorov\DataVerification\Traits\Singleton;
 use Prozorov\DataVerification\Contracts\CodeRepositoryInterface;
 use Prozorov\DataVerification\Factories\{TransportFactory, MessageFactory};
+use Prozorov\DataVerification\Messages\SmsMessage;
+use Prozorov\DataVerification\Transport\DebugTransport;
 
 class Configuration
 {
-    use Singleton;
+    protected $container;
 
     /**
      * @var CodeRepositoryInterface $codeRepo
@@ -58,27 +59,32 @@ class Configuration
     protected $transportFactory;
 
     /**
+     * @var array $resolve
+     */
+    protected $resolved= [];
+
+    /**
      * loadConfig.
      *
      * @access	public
      * @param	array	$config	Default: []
      * @return	void
      */
-    public function loadConfig(array $config = []): void
+    public function __construct($container, array $config = [])
     {
+        $this->container = $container;
+
         if (empty($config['code_repository'])) {
             throw new \InvalidArgumentException('Укажите класс-репозиторий данных');
         }
 
-        $this->codeRepo = new $config['code_repository'];
+        $this->codeRepo = $config['code_repository'];
 
-        $defaultTransport = ['sms' => \Prozorov\DataVerification\Transport\DebugTransport::class];
-        $transportConfig = $config['transport_config'] ?? $defaultTransport;
-        TransportFactory::getInstance()->loadConfig($transportConfig);
+        $transportConfig = $config['transport_config'] ?? ['sms' => DebugTransport::class];
+        $this->transportFactory = new TransportFactory($transportConfig);
 
-        $defaultMessages = ['sms' => \Prozorov\DataVerification\Messages\SmsMessage::class];
-        $messageConfig = $config['messages'] ?? $defaultMessages;
-        MessageFactory::getInstance()->loadConfig($messageConfig);
+        $messageConfig = $config['messages'] ?? ['sms' => SmsMessage::class];
+        $this->messageFactory = new MessageFactory($messageConfig);
 
         $this->allowedSymbols = $config['allowed_symbols'] ?? range(0, 9);
         $this->passLength = $config['pass_length'] ?? 4;
@@ -96,25 +102,11 @@ class Configuration
      */
     public function getCodeRepo(): CodeRepositoryInterface
     {
-        if (empty($this->codeRepo)) {
-            $this->loadConfig();
+        if (is_object($this->codeRepo) && ($this->codeRepo instanceof CodeRepositoryInterface)) {
+            return $this->codeRepo;
         }
 
-        return $this->codeRepo;
-    }
-
-    /**
-     * Set the value of codeRepo
-     *
-     * @access	public
-     * @param	mixed	$codeRepo	
-     * @return	Configuration
-     */
-    public function setCodeRepo($codeRepo): Configuration
-    {
-        $this->codeRepo = $codeRepo;
-
-        return $this;
+        return $this->getResolved('code_repository', $this->codeRepo);
     }
 
     /**
@@ -125,10 +117,6 @@ class Configuration
      */
     public function getAllowedSymbols(): array
     {
-        if (empty($this->allowedSymbols)) {
-            $this->loadConfig();
-        }
-
         return $this->allowedSymbols;
     }
 
@@ -195,7 +183,7 @@ class Configuration
      */
     public function getTransportFactory(): TransportFactory
     {
-        return TransportFactory::getInstance();
+        return $this->transportFactory;
     }
 
     /**
@@ -206,6 +194,48 @@ class Configuration
      */
     public function getMessageFactory(): MessageFactory
     {
-        return MessageFactory::getInstance();
+        return $this->messageFactory;
+    }
+
+    /**
+     * getResolved.
+     *
+     * @access	protected
+     * @param	string	$definition    	
+     * @param	mixed	$implementation	
+     * @return	mixed
+     */
+    protected function getResolved(string $definition, $implementation)
+    {
+        if (empty($this->resolved[$definition])) {
+            $this->resolve($definition, $implementation);
+        }
+
+        return $this->resolved[$definition];
+    }
+
+    /**
+     * resolve.
+     *
+     * @access	protected
+     * @param	string	$definition    	
+     * @param	mixed	$implementation	
+     * @return	void
+     */
+    protected function resolve(string $definition, $implementation): void
+    {
+        if (is_callable($implementation)) {
+            $this->resolved[$definition] = $implementation();
+
+            return;
+        }
+
+        if (is_object($implementation)) {
+            $this->resolved[$definition] = $implementation;
+
+            return;
+        }
+
+        $this->resolved[$definition] = $this->container->get($implementation);
     }
 }

@@ -2,9 +2,17 @@
 
 namespace Prozorov\DataVerification\Contracts;
 
-use Prozorov\DataVerification\Types\Address;
+use Prozorov\DataVerification\Messages\AbstractMessage;
 
 interface TransportInterface
 {
-    public function send(Address $address, string $text);
+    /**
+     * send.
+     *
+     * @access	public
+     * @param	Address	$address
+     * @param	string 	$text
+     * @return	void
+     */
+    public function send(AbstractMessage $mesage): void;
 }

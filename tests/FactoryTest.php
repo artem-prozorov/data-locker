@@ -8,19 +8,9 @@ use Prozorov\DataVerification\Exceptions\{ConfigurationException, FactoryExcepti
 
 class FactoryTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        MessageFactory::getInstance()->resetConfig();
-        TransportFactory::getInstance()->resetConfig();
-    }
-
     public function testMessageFactory()
     {
-        $factory = MessageFactory::getInstance();
-
-        $factory->loadConfig([
+        $factory = new MessageFactory([
             'sms' => SmsMessage::class,
         ]);
 
@@ -32,32 +22,20 @@ class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_an_exception_when_no_config_is_loaded()
-    {
-        $this->expectException(ConfigurationException::class);
-
-        MessageFactory::getInstance()->make('test');
-    }
-
-    /**
-     * @test
-     */
     public function it_throws_an_exception_once_invalid_code_is_passed()
     {
         $this->expectException(FactoryException::class);
 
-        MessageFactory::getInstance()->loadConfig([
+        $factory = new MessageFactory([
             'sms' => SmsMessage::class,
         ]);
 
-        MessageFactory::getInstance()->make('test');
+        $factory->make('test');
     }
 
     public function testTransportFactory()
     {
-        $factory = TransportFactory::getInstance();
-
-        $factory->loadConfig([
+        $factory = new TransportFactory([
             'debug' => DebugTransport::class,
         ]);
 

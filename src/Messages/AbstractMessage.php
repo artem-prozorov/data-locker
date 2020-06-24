@@ -39,13 +39,20 @@ abstract class AbstractMessage
      */
     public function via(string $code): AbstractMessage
     {
-        if (! Configuration::getInstance()->getTransportFactory()->entityExists($code)) {
-            throw new \InvalidArgumentException('Такой метод доставки сообщения '.$code.' недоступен');
-        }
-
         $this->transportCode = $code;
 
         return $this;
+    }
+
+    /**
+     * getTransportCode.
+     *
+     * @access	public
+     * @return	string
+     */
+    public function getTransportCode(): string
+    {
+        return (string) $this->transportCode;
     }
 
     /**
@@ -129,21 +136,6 @@ abstract class AbstractMessage
     public function getAddress(): Address
     {
         return $this->address;
-    }
-
-    /**
-     * send.
-     *
-     * @access	public
-     * @return	void
-     */
-    public function send(): void
-    {
-        $text = $this->render();
-
-        $transport = Configuration::getInstance()->getTransportFactory()->make($this->transportCode);
-
-        $transport->send($this->getAddress(), $text);
     }
 
     /**

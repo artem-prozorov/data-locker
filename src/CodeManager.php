@@ -2,21 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Prozorov\DataVerification\App;
+namespace Prozorov\DataVerification;
 
-use Prozorov\DataVerification\Traits\Singleton;
-use Prozorov\DataVerification\App\Configuration;
 use Prozorov\DataVerification\Exceptions\{LimitException, VerificationException};
 use Prozorov\DataVerification\Models\Code;
 use Prozorov\DataVerification\Types\Address;
 
 class CodeManager
 {
-    use Singleton;
-
-    protected function __construct()
+    public function __construct(Configuration $config)
     {
-        $this->config = Configuration::getInstance();
+        $this->config = $config;
     }
 
     /**
@@ -42,7 +38,7 @@ class CodeManager
             $code->setVerificationData($data);
         }
 
-        $code->save();
+        $this->config->getCodeRepo()->save($code);
 
         return $code;
     }
@@ -57,11 +53,11 @@ class CodeManager
      */
     public function verify(string $verificationCode, string $pass): Code
     {
-        $repo = $this->config->getCodeRepo();
         $seconds = $this->config->getPasswordValidationPeriod();
 
         $createdAfter = (new \Datetime())->sub(new \DateInterval('PT'.$seconds.'S'));
-        $code = $repo->getOneUnvalidatedByCode($verificationCode, $createdAfter);
+        $code = $this->config->getCodeRepo()->getOneUnvalidatedByCode($verificationCode, $createdAfter);
+
         if (!$code) {
             throw new \OutOfBoundsException('Данные не найдены');
         }
@@ -75,7 +71,9 @@ class CodeManager
             throw new LimitException('Превышен лимит');
         }
 
-        $code->setValidated()->save();
+        $code->setValidated();
+        
+        $this->config->getCodeRepo()->save($code);
 
         return $code;
     }
@@ -107,18 +105,16 @@ class CodeManager
      */
     protected function checkCreationLimit(Address $address): void
     {
-        $repo = $this->config->getCodeRepo();
-
         $threshold = $this->config->getCreationCodeThreshold();
 
         $createdAfter = (new \Datetime())->sub(new \DateInterval('PT'.$threshold.'S'));
 
-        if ($repo->getLastCodeForAddress($address, $createdAfter)) {
+        if ($this->config->getCodeRepo()->getLastCodeForAddress($address, $createdAfter)) {
             throw new LimitException('Превышен лимит');
         }
 
         $createdAfter = (new \Datetime())->sub(new \DateInterval('PT3600S'));
-        if ($attempts = $repo->getCodesCountForAddress($address, $createdAfter)) {
+        if ($attempts = $this->config->getCodeRepo()->getCodesCountForAddress($address, $createdAfter)) {
             $limitPerHour = $this->config->getLimitPerHour();
             if ($limitPerHour < $attempts) {
                 throw new LimitException('Превышен лимит обращений в час');

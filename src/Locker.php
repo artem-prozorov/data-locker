@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Prozorov\DataVerification\App;
+namespace Prozorov\DataVerification;
 
 use Prozorov\DataVerification\Contracts\MessageInterface;
 use Prozorov\DataVerification\Models\Code;
 use Prozorov\DataVerification\Types\Address;
+use Webmozart\Assert\Assert;
 
-class Controller
+class Locker
 {
     /**
      * @var Configuration $config
@@ -20,19 +21,19 @@ class Controller
      */
     protected $manager;
 
-    public function __construct()
+    public function __construct(Configuration $config)
     {
-        $this->config = Configuration::getInstance();
-        $this->manager = CodeManager::getInstance();
+        $this->config = $config;
+        $this->manager = new CodeManager($config);
     }
 
     /**
      * lockData.
      *
      * @access	public
-     * @param	array                      	$data         	- the data that must be locked and verified
-     * @param	Address	$address      	- address where we will send one-time password to
-     * @param	MessageInterface|string   	$message        - message object or string code for the message factory
+     * @param	array $data - the data that must be locked and verified
+     * @param	Address	$address - address where we will send one-time password to
+     * @param	MessageInterface|string $message - message object or string code for the message factory
      * @return	Code
      */
     public function lockData(array $data, Address $address, $message): Code
@@ -43,7 +44,14 @@ class Controller
             $message = $this->config->getMessageFactory()->make($message);
         }
 
-        $message->setCode($code)->setAddress($address)->send();
+        Assert::isInstanceOf($message, MessageInterface::class);
+
+        $message->setCode($code)->setAddress($address);
+
+        $transport = $this->config->getTransportFactory()
+            ->make($message->getTransportCode());
+        
+        $transport->send($message);
 
         return $code;
     }

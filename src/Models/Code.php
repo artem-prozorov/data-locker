@@ -64,7 +64,7 @@ class Code
         $this->attempts = $data['ATTEMPTS'] ?? 0;
         $this->validated = ($data['VALIDATED'] === 'Y') ? true : false;
         $this->verificationData = $data['DATA'] ?? [];
-       
+
         $address = (string) ($data['ADDRESS'] ?? '');
         $this->address = new Address($address);
     }
@@ -298,16 +298,5 @@ class Code
         $this->validated = true;
 
         return $this;
-    }
-
-    /**
-     * save.
-     *
-     * @access	public
-     * @return	Code
-     */
-    public function save(): Code
-    {
-        return Configuration::getInstance()->getCodeRepo()->save($this);
     }
 }
