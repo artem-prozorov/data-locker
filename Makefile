@@ -11,4 +11,7 @@ phpunit:  ## Run phpUnit tests
 	@docker run --rm --interactive --tty   --volume $$PWD:/app   --user $$(id -u):$$(id -g)   composer test
 
 dump-autoload:  ## Dumps composer autoload files
-	@docker run --rm --interactive --tty   --volume $PWD:/app   --user $(id -u):$(id -g)   composer dump-autoload
+	@docker run --rm --interactive --tty   --volume $$PWD:/app   --user $$(id -u):$$(id -g)   composer dump-autoload
+
+install:  ## Dumps composer autoload files
+	@docker run --rm --interactive --tty   --volume $$PWD:/app   --user $$(id -u):$$(id -g)   composer install
