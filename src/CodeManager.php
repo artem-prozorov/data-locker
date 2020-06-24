@@ -25,7 +25,7 @@ class CodeManager
      *
      * @access	public
      * @param	Address	$address	
-     * @param	array                      	$data   	Default: null
+     * @param	array $data Default: null
      * @return	Code
      */
     public function generate(Address $address, array $data = null): Code
