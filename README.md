@@ -1,5 +1,9 @@
 # Data Locker: библиотека для защиты информации одноразовым паролем
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/badges/build.png?b=master)](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/build-status/master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/artem-prozorov/data-locker/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 
 ## Установка
 
@@ -36,13 +40,6 @@
 use Prozorov\DataVerification\App\Controller;
 use Prozorov\DataVerification\Types\Phone;
 use Prozorov\DataVerification\Integrations\Bitrix\Repositories\CodeRepo;
-
-Configuration::getInstance()->loadConfig([
-    'code_repository' => CodeRepo::class,
-    'transport_config' => [
-        'sms' => \Brosto\Loyalty\Integrations\SimpleSms\Transport::class, // указываем каким транспортом пользоваться
-    ],
-]);
 
 $request = \Bitrix\Main\Application::getInstance()->getContext()->getRequest();
 
