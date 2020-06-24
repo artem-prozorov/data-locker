@@ -62,7 +62,7 @@ class Code
         $this->verificationCode = (string) ($data['VERIFICATION_CODE'] ?? null);
         $this->pass = (string) ($data['PASS'] ?? null);
         $this->attempts = $data['ATTEMPTS'] ?? 0;
-        $this->validated = ($data['VALIDATED'] === 'Y') ? true : false;
+        $this->validated = (isset($data['VALIDATED']) && $data['VALIDATED'] === 'Y') ? true : false;
         $this->verificationData = $data['DATA'] ?? [];
 
         $address = (string) ($data['ADDRESS'] ?? '');

@@ -35,11 +35,7 @@ class DebugTransport implements TransportInterface
 
             $filename = $this->getPath() . '/' . $address->__toString() . '_' . $this->getTimestamp() . '.txt';
 
-            $test = $this->putContents($filename, $text);
-
-            var_dump($test);
-
-            if (! $test) {
+            if (! $this->putContents($filename, $text)) {
                 throw new \RuntimeException('Unable to write data');
             }
         } catch (\Exception $exception) {
