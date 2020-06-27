@@ -26,7 +26,7 @@ interface CodeRepositoryInterface
      * @param	Code	$code	
      * @return	void
      */
-    public function delete(Code $code);
+    public function delete(Code $code): void;
 
     /**
      * getOneUnvalidatedByCode.
@@ -34,9 +34,9 @@ interface CodeRepositoryInterface
      * @access	public
      * @param	string  	$code        	
      * @param	Datetime	$createdAfter	Default: null
-     * @return	void
+     * @return	Code|void
      */
-    public function getOneUnvalidatedByCode(string $code, Datetime $createdAfter = null);
+    public function getOneUnvalidatedByCode(string $code, Datetime $createdAfter = null): ?Code;
 
     /**
      * getLastCodeForAddress.
@@ -44,9 +44,9 @@ interface CodeRepositoryInterface
      * @access	public
      * @param	Address	$address     	
      * @param	Datetime                   	$createdAfter	Default: null
-     * @return	void
+     * @return	Code|void
      */
-    public function getLastCodeForAddress(Address $address, Datetime $createdAfter = null);
+    public function getLastCodeForAddress(Address $address, Datetime $createdAfter = null): ?Code;
 
     /**
      * getCodesCountForAddress.

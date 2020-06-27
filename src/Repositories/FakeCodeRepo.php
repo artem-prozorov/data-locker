@@ -21,7 +21,7 @@ class FakeCodeRepo implements CodeRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function delete(Code $code)
+    public function delete(Code $code): void
     {
         
     }
@@ -45,7 +45,7 @@ class FakeCodeRepo implements CodeRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function getOneUnvalidatedByCode(string $code, Datetime $createdAfter = null)
+    public function getOneUnvalidatedByCode(string $code, Datetime $createdAfter = null): ?Code
     {
         return null;
     }
@@ -53,7 +53,7 @@ class FakeCodeRepo implements CodeRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function getLastCodeForAddress(Address $address, Datetime $createdAfter = null)
+    public function getLastCodeForAddress(Address $address, Datetime $createdAfter = null): ?Code
     {
         return null;
     }
@@ -61,7 +61,7 @@ class FakeCodeRepo implements CodeRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function getCodesCountForAddress(Address $address, Datetime $createdAfter = null): int
+    public function getCodesCountForAddress(Address $address, Datetime $createdAfter = null): ?int
     {
         return 0;
     }
