@@ -36,9 +36,9 @@ class Locker
      * @param	AbstractMessage|string $message - message object or string code for the message factory
      * @return	Code
      */
-    public function lockData(array $data, Address $address, $message): Code
+    public function lockData(array $data, Address $address, $message, string $fakeCode = null): Code
     {
-        $code = $this->manager->generate($address, $data);
+        $code = $this->manager->generate($address, $data, $fakeCode);
 
         if (is_string($message)) {
             $message = $this->config->getMessageFactory()->make($message);

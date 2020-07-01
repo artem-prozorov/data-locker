@@ -24,24 +24,6 @@ abstract class AbstractFactory
 
     public function __construct(array $config)
     {
-        $this->loadConfig($config);
-    }
-
-    /**
-     * loadConfig.
-     *
-     * @access	protected
-     * @param	array	$config	
-     * @return	void
-     */
-    protected function loadConfig(array $config): void
-    {
-        foreach ($config as $code => $class) {
-            if (!class_exists($class)) {
-                throw new FactoryException('Фабрика не сможет создать такой объект: '.$class);
-            }
-        }
-
         $this->config = $config;
     }
 

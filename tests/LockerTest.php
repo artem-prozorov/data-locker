@@ -49,4 +49,20 @@ class LockerTest extends MockeryTestCase
 
         $this->assertEquals($data, $unlocked);
     }
+
+    public function testFakeCode()
+    {
+        $config = new Configuration(
+            $this->getContainer(),
+            ['code_repository' => new FakeCodeRepo()]
+        );
+
+        $locker = new Locker($config);
+
+        $fakeCode = '1234';
+
+        $code = $locker->lockData(['some data'], new Phone('89181234567'), new SmsMessage(), $fakeCode);
+
+        $this->assertEquals($fakeCode, $code->getOneTimePass());
+    }
 }

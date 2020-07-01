@@ -24,11 +24,12 @@ class CodeManager
      * generate.
      *
      * @access	public
-     * @param	Address	$address	
-     * @param	array $data Default: null
+     * @param	Address	$address
+     * @param	array  	$data    	Default: null
+     * @param	string 	$fakeCode	Default: null
      * @return	Code
      */
-    public function generate(Address $address, array $data = null): Code
+    public function generate(Address $address, array $data = null, string $fakeCode = null): Code
     {
         $this->checkCreationLimit($address);
 
@@ -36,7 +37,7 @@ class CodeManager
 
         $code = new Code();
         $code->setVerificationCode($verificationCode)
-            ->setOneTimePass($this->generateOTP())
+            ->setOneTimePass($this->generateOTP($fakeCode))
             ->setAddress($address);
 
         if (!empty($data)) {
@@ -87,10 +88,15 @@ class CodeManager
      * generateOTP.
      *
      * @access	protected
+     * @param	string	$fakeCode	Default: null
      * @return	string
      */
-    protected function generateOTP(): string
+    protected function generateOTP(string $fakeCode = null): string
     {
+        if (! empty($fakeCode)) {
+            return $fakeCode;
+        }
+
         $symbols = $this->config->getAllowedSymbols();
         $length = $this->config->getPassLength();
         $otp = '';
