@@ -41,8 +41,11 @@ class FactoryTest extends TestCase
             'debug' => DebugTransport::class,
         ]);
 
-        $message = $factory->make('debug');
+        $firstMessage = $factory->make('debug');
+        $secondMessage = $factory->make('debug');
 
-        $this->assertTrue($message instanceof DebugTransport);
+        $this->assertTrue($firstMessage instanceof DebugTransport);
+
+        $this->assertSame($firstMessage, $secondMessage);
     }
 }

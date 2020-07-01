@@ -17,6 +17,11 @@ abstract class AbstractFactory
      */
     protected $config = [];
 
+    /**
+     * @var array $resolved
+     */
+    protected $resolved = [];
+
     public function __construct(array $config)
     {
         $this->loadConfig($config);
@@ -49,19 +54,40 @@ abstract class AbstractFactory
      */
     public function make(string $code)
     {
+        if (! empty($this->resolved[$code])) {
+            return $this->resolved[$code];
+        }
+
         if (empty($this->config)) {
             throw new ConfigurationException('Фабрика не инициализирована');
         }
 
+        if (is_callable($this->config[$code])) {
+            $resolved = $this->config[$code]();
+        } elseif (is_string($code)) {
+            $resolved = $this->getResolvedFromString($code);
+        }
+
+        Assert::isInstanceOf($resolved, $this->allowedType);
+
+        $this->resolved[$code] = $resolved;
+
+        return $this->resolved[$code];
+    }
+
+    /**
+     * getResolvedFromString.
+     *
+     * @access	protected
+     * @return	mixed
+     */
+    protected function getResolvedFromString(string $code)
+    {
         if (! $this->entityExists($code)) {
             throw new FactoryException('Фабрика не может сделать такую сущность');
         }
 
-        $resolved = new $this->config[$code];
-
-        Assert::isInstanceOf($resolved, $this->allowedType);
-
-        return $resolved;
+        return new $this->config[$code];
     }
 
     /**
