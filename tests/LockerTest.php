@@ -61,7 +61,9 @@ class LockerTest extends MockeryTestCase
 
         $fakeCode = '1234';
 
-        $code = $locker->lockData(['some data'], new Phone('89181234567'), new SmsMessage(), $fakeCode);
+        Locker::useFakePass($fakeCode);
+
+        $code = $locker->lockData(['some data'], new Phone('89181234567'), new SmsMessage());
 
         $this->assertEquals($fakeCode, $code->getOneTimePass());
     }

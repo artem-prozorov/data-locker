@@ -21,6 +21,23 @@ class Locker
      */
     protected $manager;
 
+    /**
+     * @var string $otp
+     */
+    protected static $otp;
+
+    /**
+     * useFakePass.
+     *
+     * @access	public static
+     * @param	string	$code
+     * @return	void
+     */
+    public static function useFakePass(string $otp): void
+    {
+        static::$otp = $otp;
+    }
+
     public function __construct(Configuration $config)
     {
         $this->config = $config;
@@ -36,9 +53,9 @@ class Locker
      * @param	AbstractMessage|string $message - message object or string code for the message factory
      * @return	Code
      */
-    public function lockData(array $data, Address $address, $message, string $fakeCode = null): Code
+    public function lockData(array $data, Address $address, $message): Code
     {
-        $code = $this->manager->generate($address, $data, $fakeCode);
+        $code = $this->manager->generate($address, $data, static::$otp);
 
         if (is_string($message)) {
             $message = $this->config->getMessageFactory()->make($message);
