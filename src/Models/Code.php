@@ -217,6 +217,7 @@ class Code
     public function setAddress(Address $address): Code
     {
         $this->address = $address;
+        $this->addressType = get_class($address);
 
         return $this;
     }

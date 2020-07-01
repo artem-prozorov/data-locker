@@ -67,7 +67,7 @@ class Locker
 
         $transport = $this->config->getTransportFactory()
             ->make($message->getTransportCode());
-        
+
         $transport->send($message);
 
         return $code;
