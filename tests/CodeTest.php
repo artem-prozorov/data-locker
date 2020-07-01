@@ -4,6 +4,7 @@ namespace Prozorov\DataVerification\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Prozorov\DataVerification\Models\{Code, VerificationData};
+use Prozorov\DataVerification\Types\Phone;
 
 class CodeTest extends TestCase
 {
@@ -23,6 +24,7 @@ class CodeTest extends TestCase
         $row = [
             'ID' => 1,
             'VERIFICATION_CODE' => 12345678,
+            'ADDRESS_TYPE' => Phone::class,
             'ADDRESS' => 89181234567,
             'PASS' => 1234,
             'ATTEMPTS' => 1,
@@ -31,6 +33,8 @@ class CodeTest extends TestCase
         ];
 
         $code = new Code($row);
+
+        $this->assertInstanceOf(Phone::class, $code->getAddress());
 
         $this->assertEquals($row['ID'], $code->getId());
         $this->assertEquals($row['VERIFICATION_CODE'], $code->getVerificationCode());

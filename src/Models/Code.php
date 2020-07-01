@@ -51,6 +51,11 @@ class Code
      */
     protected $createdAt;
 
+    /**
+     * @var string $addressType
+     */
+    protected $addressType;
+
     public function __construct(array $data = [])
     {
         if (empty($data)) {
@@ -65,8 +70,11 @@ class Code
         $this->validated = (isset($data['VALIDATED']) && $data['VALIDATED'] === 'Y') ? true : false;
         $this->verificationData = $data['DATA'] ?? [];
 
+        $this->addressType = $data['ADDRESS_TYPE'] ?? Address::class;
+
         $address = (string) ($data['ADDRESS'] ?? '');
-        $this->address = new Address($address);
+
+        $this->address = new $this->addressType($address);
     }
 
     /**
@@ -296,6 +304,30 @@ class Code
     public function setValidated(): Code
     {
         $this->validated = true;
+
+        return $this;
+    }
+
+    /**
+     * Get $addressType
+     *
+     * @return  string
+     */ 
+    public function getAddressType()
+    {
+        return $this->addressType;
+    }
+
+    /**
+     * Set $addressType
+     *
+     * @param  string  $addressType  $addressType
+     *
+     * @return  self
+     */ 
+    public function setAddressType(string $addressType)
+    {
+        $this->addressType = $addressType;
 
         return $this;
     }

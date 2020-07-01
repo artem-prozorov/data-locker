@@ -121,8 +121,11 @@ class CodeManager
 
         $createdAfter = (new \Datetime())->sub(new \DateInterval('PT3600S'));
 
-        if ($attempts = $this->config->getCodeRepo()->getCodesCountForAddress($address, $createdAfter)) {
+        $attempts = $this->config->getCodeRepo()->getCodesCountForAddress($address, $createdAfter);
+
+        if ($attempts > 0) {
             $limitPerHour = $this->config->getLimitPerHour();
+
             if ($limitPerHour < $attempts) {
                 throw new LimitException('Превышен лимит обращений в час');
             }
