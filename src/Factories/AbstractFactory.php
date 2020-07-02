@@ -44,6 +44,10 @@ abstract class AbstractFactory
             throw new ConfigurationException('Фабрика не инициализирована');
         }
 
+        if (empty($this->config[$code])) {
+            throw new FactoryException('Отсутствуют инструкции по созданию объекта ' . $code);
+        }
+
         if (is_callable($this->config[$code])) {
             $resolved = $this->config[$code]();
         } elseif (is_string($code)) {
