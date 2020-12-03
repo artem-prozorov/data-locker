@@ -35,7 +35,7 @@ class FactoryTest extends TestCase
         $factory->make('test');
     }
 
-    public function testTransportFactory()
+    public function testTransportFactoryCreatesSingletons()
     {
         $factory = new TransportFactory([
             'debug' => DebugTransport::class,
@@ -47,5 +47,17 @@ class FactoryTest extends TestCase
         $this->assertTrue($firstMessage instanceof DebugTransport);
 
         $this->assertSame($firstMessage, $secondMessage);
+    }
+
+    public function testMessagesAreNotSingletons()
+    {
+        $factory = new MessageFactory([
+            'sms' => SmsMessage::class,
+        ]);
+
+        $firstMessage = $factory->make('sms');
+        $secondMessage = $factory->make('sms');
+
+        $this->assertNotSame($firstMessage, $secondMessage);
     }
 }

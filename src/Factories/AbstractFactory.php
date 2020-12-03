@@ -22,6 +22,11 @@ abstract class AbstractFactory
      */
     protected $resolved = [];
 
+    /**
+     * @var bool $singletons
+     */
+    protected $singletons = true;
+
     public function __construct(array $config)
     {
         $this->config = $config;
@@ -55,6 +60,10 @@ abstract class AbstractFactory
         }
 
         Assert::isInstanceOf($resolved, $this->allowedType);
+
+        if (! $this->singletons) {
+            return $resolved;
+        }
 
         $this->resolved[$code] = $resolved;
 
