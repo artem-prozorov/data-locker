@@ -150,6 +150,32 @@ class CodeManagerTest extends MockeryTestCase
     }
 
     /**
+     * Проверяем, что в случае ввода некорректного сообщения количество попыток увеличивается
+     * и сновое значение сохраняется в репозитории
+     */
+    public function testAttemptsAreIncrementedIfPassIsIncorrect()
+    {
+        $testData = ['test_verification_data'];
+
+        $code = new Code();
+        $code->setOneTimePass(1234)->setVerificationData($testData);
+
+        $codeRepo = Mockery::mock(FakeCodeRepo::class);
+        $codeRepo->shouldReceive('getOneUnvalidatedByCode')->andReturn($code);
+        $expectation = $codeRepo->shouldReceive('save')->once();
+
+        $manager = $this->getManager(['code_repository' => $codeRepo]);
+
+        $this->expectException(VerificationException::class);
+
+        $this->assertEquals(0, $code->getAttempts());
+
+        $resultCode = $manager->verify('test', 4321);
+
+        $this->assertEquals(1, $code->getAttempts());
+    }
+
+    /**
      * Проверяем что в случае наличия диспетчера событий вызов к нему обсуществляется
      */
     public function testOtpGenerationEventIsEmitted()

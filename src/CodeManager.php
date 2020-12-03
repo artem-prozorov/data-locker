@@ -76,6 +76,8 @@ class CodeManager
 
         if ($code->getOneTimePass() !== $pass) {
             $code->incrementAttempts();
+            $this->config->getCodeRepo()->save($code);
+
             throw new VerificationException('Некорректно указан код');
         }
 
