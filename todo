@@ -1,3 +1,0 @@
-+ Remove abstract model and move it's logic to Code instead
-+ Remove CodeInterface
-- Remove Singleton trait, provide Configuration with DI
