@@ -72,10 +72,10 @@ class Configuration
         $this->codeRepo = $config['code_repository'];
 
         $transportConfig = $config['transport'] ?? ['sms' => DebugTransport::class];
-        $this->transportFactory = new TransportFactory($transportConfig);
+        $this->transportFactory = new TransportFactory($transportConfig, $container);
 
         $messageConfig = $config['messages'] ?? ['sms' => SmsMessage::class];
-        $this->messageFactory = new MessageFactory($messageConfig);
+        $this->messageFactory = new MessageFactory($messageConfig, $container);
 
         if (! empty($config['passwords'])) {
             foreach ($config['passwords'] as $code => $passwordConfig) {
