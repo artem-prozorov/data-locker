@@ -57,6 +57,32 @@ class Locker
     }
 
     /**
+     * Generate Code and send
+     *
+     * @access	public
+     * @param	Address	$address	
+     * @param	AbstractMessage|string  	$message	
+     * @return	Code
+     */
+    public function generateAndSend(Address $address, $message): Code
+    {
+        return $this->lockData([], $address, $message);
+    }
+
+    /**
+     * Verifies 
+     *
+     * @access	public
+     * @param	string	$verificationCode	
+     * @param	string	$pass            	
+     * @return	array
+     */
+    public function verifyOrFail(string $verificationCode, string $pass): void
+    {
+        $this->manager->verify($verificationCode, $pass);
+    }
+
+    /**
      * Unlocks the data and gets the protected data
      *
      * @access	public
