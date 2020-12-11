@@ -57,4 +57,28 @@ interface CodeRepositoryInterface
      * @return	int|null
      */
     public function getCodesCountForAddress(Address $address, Datetime $createdAfter = null): ?int;
+
+    /**
+     * Opens database transaction
+     *
+     * @access	public
+     * @return	void
+     */
+    public function openTransaction(): void;
+
+    /**
+     * Commits database transaction
+     *
+     * @access	public
+     * @return	void
+     */
+    public function commitTransaction(): void;
+
+    /**
+     * Rollbacks database transaction
+     *
+     * @access	public
+     * @return	void
+     */
+    public function rollbackTransaction(): void;
 }

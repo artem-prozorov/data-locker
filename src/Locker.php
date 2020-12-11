@@ -38,22 +38,32 @@ class Locker
      */
     public function lockData(array $data, Address $address, $message): Code
     {
-        $code = $this->manager->generate($address, $data);
+        try {
+            $this->config->getCodeRepo()->openTransaction();
 
-        if (is_string($message)) {
-            $message = $this->config->getMessageFactory()->make($message);
+            $code = $this->manager->generate($address, $data);
+
+            if (is_string($message)) {
+                $message = $this->config->getMessageFactory()->make($message);
+            }
+
+            Assert::isInstanceOf($message, AbstractMessage::class);
+
+            $message->setCode($code)->setAddress($address);
+
+            $transport = $this->config->getTransportFactory()
+                ->make($message->getTransportCode());
+
+            $transport->send($message);
+
+            $this->config->getCodeRepo()->commitTransaction();
+
+            return $code;
+        } catch (\Exception $exception) {
+            $this->config->getCodeRepo()->rollbackTransaction();
+
+            throw $exception;
         }
-
-        Assert::isInstanceOf($message, AbstractMessage::class);
-
-        $message->setCode($code)->setAddress($address);
-
-        $transport = $this->config->getTransportFactory()
-            ->make($message->getTransportCode());
-
-        $transport->send($message);
-
-        return $code;
     }
 
     /**

@@ -65,4 +65,28 @@ class FakeCodeRepo implements CodeRepositoryInterface
     {
         return 0;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function openTransaction(): void
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function commitTransaction(): void
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rollbackTransaction(): void
+    {
+
+    }
 }
