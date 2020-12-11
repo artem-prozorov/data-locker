@@ -35,6 +35,8 @@ class DebugTransport implements TransportInterface
 
             $filename = $this->getPath() . '/' . $address->__toString() . '_' . $this->getTimestamp() . '.txt';
 
+            $this->ensureDirectoryExists(dirname($filename));
+
             if (! $this->putContents($filename, $text)) {
                 throw new \RuntimeException('Unable to write data');
             }
@@ -54,6 +56,20 @@ class DebugTransport implements TransportInterface
     protected function putContents(string $filename, $content)
     {
         return file_put_contents($filename, $content);
+    }
+
+    /**
+     * mkdir.
+     *
+     * @access	protected
+     * @param	string	$path
+     * @return	void
+     */
+    protected function ensureDirectoryExists(string $path): void
+    {
+        if (! is_dir($path)) {
+            mkdir($path, 0755, true);
+        }
     }
 
     /**
