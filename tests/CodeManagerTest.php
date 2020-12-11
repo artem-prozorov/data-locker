@@ -9,6 +9,7 @@ use Prozorov\DataVerification\Models\Code;
 use Prozorov\DataVerification\Types\Phone;
 use Prozorov\DataVerification\Exceptions\{LimitException, VerificationException};
 use Prozorov\DataVerification\Repositories\FakeCodeRepo;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Mockery;
 
 class CodeManagerTest extends MockeryTestCase
@@ -146,6 +147,89 @@ class CodeManagerTest extends MockeryTestCase
 
         $this->assertEquals($testData, $resultCode->getVerificationData());
         $this->assertTrue($code->isValidated());
+    }
+
+    /**
+     * Проверяем, что в случае ввода некорректного сообщения количество попыток увеличивается
+     * и сновое значение сохраняется в репозитории
+     */
+    public function testAttemptsAreIncrementedIfPassIsIncorrect()
+    {
+        $testData = ['test_verification_data'];
+
+        $code = new Code();
+        $code->setOneTimePass(1234)->setVerificationData($testData);
+
+        $codeRepo = Mockery::mock(FakeCodeRepo::class);
+        $codeRepo->shouldReceive('getOneUnvalidatedByCode')->andReturn($code);
+        $expectation = $codeRepo->shouldReceive('save')->once();
+
+        $manager = $this->getManager(['code_repository' => $codeRepo]);
+
+        $this->expectException(VerificationException::class);
+
+        $this->assertEquals(0, $code->getAttempts());
+
+        $resultCode = $manager->verify('test', 4321);
+
+        $this->assertEquals(1, $code->getAttempts());
+    }
+
+    /**
+     * Проверяем что в случае наличия диспетчера событий вызов к нему обсуществляется
+     */
+    public function testOtpGenerationEventIsEmitted()
+    {
+        $phone = new Phone('89181234567');
+
+        $eventDispatcher = Mockery::mock(EventDispatcherInterface::class);
+        $eventDispatcher->shouldReceive('dispatch')->once();
+
+        $config = new Configuration(
+            $this->getContainer(),
+            ['code_repository' => new FakeCodeRepo()],
+            $eventDispatcher
+        );
+
+        $manager = new CodeManager($config);
+
+        $code = $manager->generate($phone);
+    }
+
+    /**
+     * Проверяем что в случае наличия диспетчера событий он позволяет подменить одноразовый пароль
+     */
+    public function testEventCanSubstituteOneTimePassword()
+    {
+        $phone = new Phone('89181234567');
+
+        $expectedOtp = '123321';
+
+        $eventDispatcher = new class($expectedOtp) implements EventDispatcherInterface {
+            protected $expectedOtp;
+
+            public function __construct($expectedOtp)
+            {
+                $this->expectedOtp = $expectedOtp;
+            }
+
+            public function dispatch(object $event)
+            {
+                $event->setOtp($this->expectedOtp);
+            }
+        };
+
+        $config = new Configuration(
+            $this->getContainer(),
+            ['code_repository' => new FakeCodeRepo()],
+            $eventDispatcher
+        );
+
+        $manager = new CodeManager($config);
+
+        $code = $manager->generate($phone);
+
+        $this->assertEquals($expectedOtp, $code->getOneTimePass());
     }
 
     /**

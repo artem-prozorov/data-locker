@@ -7,6 +7,7 @@ namespace Prozorov\DataVerification;
 use Prozorov\DataVerification\Exceptions\{LimitException, VerificationException};
 use Prozorov\DataVerification\Models\Code;
 use Prozorov\DataVerification\Types\Address;
+use Prozorov\DataVerification\Events\OtpGenerationEvent;
 
 class CodeManager
 {
@@ -29,15 +30,20 @@ class CodeManager
      * @param	string 	$fakeCode	Default: null
      * @return	Code
      */
-    public function generate(Address $address, array $data = null, string $fakeCode = null): Code
+    public function generate(Address $address, array $data = null): Code
     {
         $this->checkCreationLimit($address);
+
+        $event = new OtpGenerationEvent('generating_one_time_password', $address);
+        $this->config->emitEvent($event);
+
+        $otp = $event->isModified() ? $event->getOtp() : $this->generateOTP();
 
         $verificationCode = md5((string) strtotime('now'));
 
         $code = new Code();
         $code->setVerificationCode($verificationCode)
-            ->setOneTimePass($this->generateOTP($fakeCode))
+            ->setOneTimePass($otp)
             ->setAddress($address);
 
         if (!empty($data)) {
@@ -70,6 +76,8 @@ class CodeManager
 
         if ($code->getOneTimePass() !== $pass) {
             $code->incrementAttempts();
+            $this->config->getCodeRepo()->save($code);
+
             throw new VerificationException('Некорректно указан код');
         }
 
@@ -91,12 +99,8 @@ class CodeManager
      * @param	string	$fakeCode	Default: null
      * @return	string
      */
-    protected function generateOTP(string $fakeCode = null): string
+    protected function generateOTP(): string
     {
-        if (! empty($fakeCode)) {
-            return $fakeCode;
-        }
-
         $symbols = $this->config->getAllowedSymbols();
         $length = $this->config->getPassLength();
         $otp = '';

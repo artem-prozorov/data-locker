@@ -4,6 +4,7 @@ namespace Prozorov\DataVerification\Factories;
 
 use Prozorov\DataVerification\Exceptions\{ConfigurationException, FactoryException};
 use Webmozart\Assert\Assert;
+use Psr\Container\ContainerInterface;
 
 abstract class AbstractFactory
 {
@@ -22,7 +23,17 @@ abstract class AbstractFactory
      */
     protected $resolved = [];
 
-    public function __construct(array $config)
+    /**
+     * @var bool $singletons
+     */
+    protected $singletons = true;
+
+    /**
+     * @var ContainerInterface $container
+     */
+    protected $container;
+
+    public function __construct(array $config, ContainerInterface $container = null)
     {
         $this->config = $config;
     }
@@ -56,9 +67,25 @@ abstract class AbstractFactory
 
         Assert::isInstanceOf($resolved, $this->allowedType);
 
+        if (! $this->singletons) {
+            return $resolved;
+        }
+
         $this->resolved[$code] = $resolved;
 
         return $this->resolved[$code];
+    }
+
+    /**
+     * entityExists.
+     *
+     * @access	public
+     * @param	string	$code	
+     * @return	bool
+     */
+    public function entityExists(string $code): bool
+    {
+        return array_key_exists($code, $this->config);
     }
 
     /**
@@ -73,18 +100,10 @@ abstract class AbstractFactory
             throw new FactoryException('Фабрика не может сделать такую сущность');
         }
 
-        return new $this->config[$code];
-    }
+        if (empty($this->container)) {
+            return new $this->config[$code];
+        }
 
-    /**
-     * entityExists.
-     *
-     * @access	public
-     * @param	string	$code	
-     * @return	bool
-     */
-    public function entityExists(string $code): bool
-    {
-        return array_key_exists($code, $this->config);
+        return $this->container->get($this->config[$code]);
     }
 }
